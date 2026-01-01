@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/* Adhyatmik Hisab - Custom Theme
+   Inspired by traditional Indian aesthetics:
+   - Saffron/terracotta for spirituality
+   - Cream/ivory for peace
+   - Deep forest green for nature
+   - Gold accents for auspiciousness
+*/
+
+@theme {
+  /* Color Palette */
+  --color-saffron-50: #FEF9F3;
+  --color-saffron-100: #FDF0E3;
+  --color-saffron-200: #FADCC5;
+  --color-saffron-300: #F5C199;
+  --color-saffron-400: #EE9A5E;
+  --color-saffron-500: #E8762F;
+  --color-saffron-600: #C45D35;
+  --color-saffron-700: #A34829;
+  --color-saffron-800: #843B27;
+  --color-saffron-900: #6C3324;
+  --color-saffron-950: #3A1810;
+
+  --color-forest-50: #F3FAF7;
+  --color-forest-100: #D8F0E5;
+  --color-forest-200: #B1E1CC;
+  --color-forest-300: #83CAAE;
+  --color-forest-400: #57AD8C;
+  --color-forest-500: #3A9173;
+  --color-forest-600: #2C745C;
+  --color-forest-700: #265D4C;
+  --color-forest-800: #224A3E;
+  --color-forest-900: #1F3E34;
+  --color-forest-950: #0D231D;
+
+  --color-gold-50: #FFFBEB;
+  --color-gold-100: #FEF3C7;
+  --color-gold-200: #FDE68A;
+  --color-gold-300: #FCD34D;
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B;
+  --color-gold-600: #D97706;
+  --color-gold-700: #B45309;
+  --color-gold-800: #92400E;
+  --color-gold-900: #78350F;
+  --color-gold-950: #451A03;
+
+  --color-ivory: #FFFEF7;
+  --color-parchment: #FDF6E9;
+  --color-ink: #2D2926;
+  --color-ink-light: #5C534D;
+
+  /* Semantic Colors */
+  --color-primary: var(--color-saffron-600);
+  --color-primary-hover: var(--color-saffron-700);
+  --color-secondary: var(--color-forest-600);
+  --color-accent: var(--color-gold-500);
+  --color-background: var(--color-saffron-50);
+  --color-surface: var(--color-ivory);
+  --color-surface-elevated: #FFFFFF;
+  
+  --color-success: var(--color-forest-500);
+  --color-warning: var(--color-gold-500);
+  --color-error: #DC2626;
+
+  /* Typography */
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  
+  /* Spacing */
+  --spacing-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --spacing-safe-top: env(safe-area-inset-top, 0px);
+
+  /* Border Radius */
+  --radius-card: 1rem;
+  --radius-button: 0.75rem;
+  --radius-input: 0.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(45, 41, 38, 0.08), 0 4px 12px rgba(45, 41, 38, 0.04);
+  --shadow-elevated: 0 4px 6px rgba(45, 41, 38, 0.1), 0 12px 24px rgba(45, 41, 38, 0.08);
+  --shadow-button: 0 1px 2px rgba(45, 41, 38, 0.1);
+}
+
+/* Base Styles */
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-saffron-300);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-saffron-400);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-saffron-200);
+  color: var(--color-saffron-900);
+}
+
+/* Safe area padding for mobile */
+.pb-safe {
+  padding-bottom: max(1rem, var(--spacing-safe-bottom));
+}
+
+.pt-safe {
+  padding-top: max(0.5rem, var(--spacing-safe-top));
+}
+
+/* Custom Components */
+@utility card {
+  background-color: var(--color-surface-elevated);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+@utility card-elevated {
+  background-color: var(--color-surface-elevated);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+/* Staggered animations */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
