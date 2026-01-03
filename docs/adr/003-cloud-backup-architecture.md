@@ -180,11 +180,20 @@ This scope:
 
 ### 2. Firebase Realtime DB / Firestore
 
-**Why Not:**
+**Note:** We now use Firebase for user authentication and analytics (see ADR-008), but **not** for habit data backup.
 
-- Requires billing account for production
+**Why Not for Backup:**
+
+- Requires billing account for production (though free tier exists)
 - We'd need to manage user data (privacy concerns)
 - Overkill for manual backup/restore
+- User data should remain in user's control (Google Sheets in their Drive)
+
+**Why We Use Firebase:**
+
+- User authentication (Google Sign-In)
+- Analytics events (app usage, feature adoption)
+- User profiles (email, name only - no habit data)
 
 ### 3. Local file export only
 
