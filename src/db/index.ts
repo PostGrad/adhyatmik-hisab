@@ -11,6 +11,22 @@ import type { Category, Habit, LogEntry, AppSettings } from '../types';
 import { SHUBH_HISAB_ID, ASHUBH_HISAB_ID } from '../types';
 
 // ============================================================================
+// Schema Version Constants
+// ============================================================================
+
+/**
+ * Current database schema version
+ * Increment this when making schema changes
+ */
+export const CURRENT_DB_VERSION = 2;
+
+/**
+ * Current app version (semantic versioning)
+ * Update this in package.json and sync here
+ */
+export const CURRENT_APP_VERSION = '1.0.0';
+
+// ============================================================================
 // Database Class
 // ============================================================================
 
@@ -31,12 +47,44 @@ export class AdhyatmikDatabase extends Dexie {
       settings: 'key',
     });
 
-    // Schema definition v2 - added new fields
+    // Schema definition v2 - added new fields for Shubh/Ashubh Hisab and tracking intervals
     this.version(2).stores({
       categories: 'id, order, hisabType',
       habits: 'id, categoryId, order, isActive, interval',
       logEntries: 'id, habitId, date, [date+habitId], [habitId+date]',
       settings: 'key',
+    }).upgrade(async (tx) => {
+      // Migration v1 → v2: Add new fields with defaults
+      
+      // Migrate categories: Add hisabType field
+      await tx.table('categories').toCollection().modify((category) => {
+        // Default to 'shubh' for existing categories (backward compatibility)
+        if (!('hisabType' in category)) {
+          category.hisabType = 'shubh';
+        }
+      });
+
+      // Migrate habits: Add interval, trackingDay, trackingDate, reminderEnabled fields
+      await tx.table('habits').toCollection().modify((habit) => {
+        // Default to 'daily' interval for existing habits
+        if (!('interval' in habit)) {
+          habit.interval = 'daily';
+        }
+        // Initialize optional tracking fields
+        if (!('trackingDay' in habit)) {
+          habit.trackingDay = undefined;
+        }
+        if (!('trackingDate' in habit)) {
+          habit.trackingDate = undefined;
+        }
+        // Default reminder to disabled
+        if (!('reminderEnabled' in habit)) {
+          habit.reminderEnabled = false;
+        }
+        if (!('reminderTime' in habit)) {
+          habit.reminderTime = undefined;
+        }
+      });
     });
 
     // Hooks for automatic timestamps
@@ -459,6 +507,7 @@ export async function calculateStreak(habitId: string, upToDate: string): Promis
 
 export interface ExportData {
   version: string;
+  schemaVersion: number;
   exportedAt: string;
   categories: Category[];
   habits: Habit[];
@@ -475,7 +524,8 @@ export async function exportAllData(): Promise<ExportData> {
   ]);
   
   return {
-    version: '1.0.0',
+    version: CURRENT_APP_VERSION,
+    schemaVersion: CURRENT_DB_VERSION,
     exportedAt: new Date().toISOString(),
     categories,
     habits,
@@ -486,6 +536,16 @@ export async function exportAllData(): Promise<ExportData> {
 
 export async function importAllData(data: ExportData): Promise<void> {
   await db.transaction('rw', [db.categories, db.habits, db.logEntries, db.settings], async () => {
+    // Check if imported data is from older schema version
+    const importedSchemaVersion = data.schemaVersion || 1;
+    
+    if (importedSchemaVersion < CURRENT_DB_VERSION) {
+      console.warn(
+        `Importing data from schema v${importedSchemaVersion}, current is v${CURRENT_DB_VERSION}. ` +
+        'Data will be migrated automatically during import.'
+      );
+    }
+    
     // Clear existing data
     await Promise.all([
       db.categories.clear(),
@@ -494,13 +554,17 @@ export async function importAllData(data: ExportData): Promise<void> {
       db.settings.clear(),
     ]);
     
-    // Import new data
+    // Import new data - Dexie will automatically apply migrations if needed
+    // We use bulkPut instead of bulkAdd to handle potential ID conflicts
     await Promise.all([
-      db.categories.bulkAdd(data.categories),
-      db.habits.bulkAdd(data.habits),
-      db.logEntries.bulkAdd(data.logEntries),
-      db.settings.bulkAdd(data.settings),
+      db.categories.bulkPut(data.categories),
+      db.habits.bulkPut(data.habits),
+      db.logEntries.bulkPut(data.logEntries),
+      db.settings.bulkPut(data.settings),
     ]);
+    
+    // Ensure default categories exist after import
+    await seedDefaultCategories();
   });
 }
 
