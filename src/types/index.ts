@@ -150,6 +150,10 @@ export interface AppSettings {
   lastBackupAt: Date | null;
   autoBackupEnabled: boolean;
   
+  // Authentication
+  firebaseUserId: string | null;  // Firebase user ID after signup
+  hasSignedUp: boolean;  // Whether user has completed Google signup
+  
   // Onboarding
   hasCompletedOnboarding: boolean;
   hasSeededCategories: boolean;  // Whether default categories have been created
@@ -165,6 +169,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   googleBackupEnabled: false,
   lastBackupAt: null,
   autoBackupEnabled: false,
+  firebaseUserId: null,
+  hasSignedUp: false,
   hasCompletedOnboarding: false,
   hasSeededCategories: false,
   appVersion: '1.0.0',

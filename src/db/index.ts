@@ -214,6 +214,8 @@ const DEFAULT_SETTINGS_VALUES: AppSettings = {
   googleBackupEnabled: false,
   lastBackupAt: null,
   autoBackupEnabled: false,
+  firebaseUserId: null,
+  hasSignedUp: false,
   hasCompletedOnboarding: false,
   hasSeededCategories: false,
   appVersion: '1.0.0',
